@@ -35,9 +35,15 @@ class MarvelService {
 
   //метод отримує дані та трансформує в необхідні. в нашому випадку отримує великий об'єкт з даними про персонажа і повертає об'єкт з потрібними нам даними
   _transformCharacter = (char) => {
+    const description = char.description
+      ? char.description.length > 150
+        ? char.description.slice(0, 149) + "..."
+        : char.description
+      : "There is no data about this character";
+
     return {
       name: char.name,
-      description: char.description,
+      description: description,
       thumbnail: char.thumbnail.path + "." + char.thumbnail.extension,
       homepage: char.urls[0].url,
       wiki: char.urls[1].url,
