@@ -35,6 +35,7 @@ class MarvelService {
 
   //метод отримує дані та трансформує в необхідні. в нашому випадку отримує великий об'єкт з даними про персонажа і повертає об'єкт з потрібними нам даними
   _transformCharacter = (char) => {
+    //перевірка для description
     const description = char.description
       ? char.description.length > 150
         ? char.description.slice(0, 149) + "..."
