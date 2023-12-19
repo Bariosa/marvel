@@ -7,11 +7,6 @@ import "./randomChar.scss";
 import mjolnir from "../../resources/img/mjolnir.png";
 
 class RandomChar extends Component {
-  constructor(props) {
-    super(props);
-    this.updateChar();
-  }
-
   state = {
     char: {},
     loading: true,
@@ -21,12 +16,22 @@ class RandomChar extends Component {
   //створюємо нову властивість this.marvelService всередині класу RandomChar
   marvelService = new MarvelService(); // новий екземпляр класу MarvelService, в якому зберігається нащадок класу
 
+  // один з методів життєвого циклу компонента
+  componentDidMount() {
+    this.updateChar();
+  }
+
   onCharLoaded = (char) => {
     this.setState({ char: char, loading: false });
   };
 
   onError = () => {
     this.setState({ loading: false, error: true });
+  };
+
+  onClickBtn = () => {
+    this.setState({ loading: true, error: false });
+    this.updateChar();
   };
 
   //метод звертається до сервера - отримує дані - записує в state
@@ -42,7 +47,7 @@ class RandomChar extends Component {
     const { char, loading, error } = this.state; //деструктуризація об'єкта (state) - char з даними про персонажа та loading
 
     //змінні в яких прописані умови за яких відображається компонент <ErrorMessage /> або <Spinner /> або <View />
-    const errorMessage = this.error ? <ErrorMessage /> : null;
+    const errorMessage = error ? <ErrorMessage /> : null;
     const spinner = loading ? <Spinner /> : null;
     const content = !(loading || error) ? <View char={char} /> : null;
 
@@ -59,7 +64,9 @@ class RandomChar extends Component {
           </p>
           <p className="randomchar__title">Or choose another one</p>
           <button className="button button__main">
-            <div className="inner">try it</div>
+            <div className="inner" onClick={this.onClickBtn}>
+              try it
+            </div>
           </button>
           <img src={mjolnir} alt="mjolnir" className="randomchar__decoration" />
         </div>
@@ -72,9 +79,22 @@ class RandomChar extends Component {
 const View = ({ char }) => {
   const { name, description, thumbnail, homepage, wiki } = char; //деструктуризація об'єкта (char) з даними про персонажа
 
+  // const style = thumbnail.includes("image_not_available")
+  //   ? { objectFit: "contain" }
+  //   : null;
+  const imgClass = thumbnail.includes("image_not_available")
+    ? "randomchar__img randomchar__img--no-image"
+    : "randomchar__img";
+
   return (
     <div className="randomchar__block">
-      <img src={thumbnail} alt="Random character" className="randomchar__img" />
+      <img
+        // style={style}
+        src={thumbnail}
+        alt="Random character"
+        className={imgClass}
+      />
+
       <div className="randomchar__info">
         <p className="randomchar__name">{name}</p>
         <p className="randomchar__descr">{description}</p>

@@ -15,6 +15,9 @@
         width: 180px;
         height: 180px;
         object-fit: cover;
+        &--no-image{
+            object-fit: contain;
+        }
     }
     &__info {
         display: grid;
