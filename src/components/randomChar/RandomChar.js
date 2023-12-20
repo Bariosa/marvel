@@ -29,14 +29,14 @@ class RandomChar extends Component {
     this.setState({ loading: false, error: true });
   };
 
-  onClickBtn = () => {
-    this.setState({ loading: true, error: false });
-    this.updateChar();
+  onCharLoading = () => {
+    this.setState({ loading: true });
   };
 
   //метод звертається до сервера - отримує дані - записує в state
   updateChar = () => {
     const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000); //випадкове id персонажа. рандомне число розраховується за формулою
+    this.onCharLoading();
     this.marvelService
       .getCharacter(id)
       .then(this.onCharLoaded)
@@ -64,7 +64,7 @@ class RandomChar extends Component {
           </p>
           <p className="randomchar__title">Or choose another one</p>
           <button className="button button__main">
-            <div className="inner" onClick={this.onClickBtn}>
+            <div className="inner" onClick={this.updateChar}>
               try it
             </div>
           </button>

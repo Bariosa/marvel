@@ -40,14 +40,16 @@ class MarvelService {
       ? char.description.length > 150
         ? char.description.slice(0, 149) + "..."
         : char.description
-      : "There is no data about this character";
+      : `There is no data about ${char.name}`;
 
     return {
+      id: char.id,
       name: char.name,
       description: description,
       thumbnail: char.thumbnail.path + "." + char.thumbnail.extension,
       homepage: char.urls[0].url,
       wiki: char.urls[1].url,
+      comics: char.comics.items,
     };
   };
 }

@@ -33,13 +33,15 @@ class CharList extends Component {
   }
 
   render() {
-    console.log("render 1");
     if (this.state.error) return <ErrorMessage />;
     if (this.state.loading) return <Spinner />;
-    console.log("render 2");
 
     const renderCharsList = this.state.chars.map((char) => (
-      <li key={char.wiki} className="char__item">
+      <li
+        key={char.id}
+        className="char__item"
+        onClick={() => this.props.onCharSelected(char.id)} //передаємо пропси з App.js
+      >
         <img
           src={char.thumbnail}
           alt={char.name}
