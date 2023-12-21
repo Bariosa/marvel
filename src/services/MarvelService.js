@@ -1,6 +1,7 @@
 class MarvelService {
   _apiBase = "https://gateway.marvel.com:443/v1/public/";
   _apiKey = "apikey=e71e2718fabff072296a2d9a69c1759c";
+  _baseOffset = 210;
 
   //функція getResource - запитує дані через fetch, чекає на відповідь у разі помилки(серверні, наприклад 404) видає повідомлення у консоль, якщо все ок, то отримуємо відповідь у форматі json
   getResource = async (url) => {
@@ -16,9 +17,9 @@ class MarvelService {
   // запити до API
 
   //запит на групу персонажів
-  getAllCharacters = async () => {
+  getAllCharacters = async (offset = this._baseOffset) => {
     const result = await this.getResource(
-      `${this._apiBase}characters?limit=9&offset=210&${this._apiKey}`,
+      `${this._apiBase}characters?limit=9&offset=${offset}&${this._apiKey}`,
     ); // Request URL з сайту Marvel Developer
 
     //повертаємо масив з новими об'єктами
