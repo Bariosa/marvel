@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { Component, createRef } from "react";
 
 import "./charList.scss";
 import MarvelService from "../../services/MarvelService";
@@ -7,6 +7,12 @@ import ErrorMessage from "../errorMessage/ErrorMessage";
 import PropTypes from "prop-types";
 
 class CharList extends Component {
+  //new
+  constructor(props) {
+    super(props);
+    this.myRef = createRef();
+  }
+
   state = {
     chars: [], // Список персонажів
     loading: true, //  вказує на те, чи йде завантаження
@@ -22,6 +28,11 @@ class CharList extends Component {
     // Викликається після монтажу компонента
     this.onRequest(); // Запуск методу для отримання персонажів
   }
+
+  onItemHandler = (id) => {
+    this.props.onCharSelected(id);
+    this.myRef.current = id;
+  };
 
   // Метод для отримання нових персонажів
   onRequest = () => {
@@ -70,9 +81,16 @@ class CharList extends Component {
     // Формування списку персонажів для відображення
     const renderCharsList = this.state.chars.map((char) => (
       <li
+        //new
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === " " || e.key === "Enter") this.onItemHandler(char.id);
+        }}
         key={char.id}
-        className="char__item"
-        onClick={() => this.props.onCharSelected(char.id)} // Передача ідентифікатора обраного персонажа до App.js
+        className={`char__item ${
+          char.id === this.myRef.current ? "char__item--selected" : ""
+        }`}
+        onClick={() => this.onItemHandler(char.id)} // Передача ідентифікатора обраного персонажа до App.js
       >
         <img
           src={char.thumbnail}
