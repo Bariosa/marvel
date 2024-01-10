@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 import Spinner from "../spinner/Spinner";
@@ -8,70 +8,60 @@ import MarvelService from "../../services/MarvelService";
 
 import "./charInfo.scss";
 
-class CharInfo extends Component {
-  state = {
-    char: null,
-    loading: false,
-    error: false,
-  };
+const CharInfo = (props) => {
+  const [char, setChar] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   //створюємо нову властивість this.marvelService всередині класу CharInfo
-  marvelService = new MarvelService(); // новий екземпляр класу MarvelService, в якому зберігається нащадок класу
+  const marvelService = new MarvelService(); // новий екземпляр класу MarvelService, в якому зберігається нащадок класу
 
-  componentDidMount() {
-    this.updateChar();
-  }
+  useEffect(() => {
+    updateChar();
+  }, []);
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.props.charId !== prevProps.charId) {
-      this.updateChar();
-    }
-  }
+  useEffect(() => {
+    updateChar();
+  }, [props.charId]);
 
-  updateChar = () => {
-    const { charId } = this.props; //передаємо пропси з App.js. деструктуруємо charId
+  const updateChar = () => {
+    const { charId } = props; //передаємо пропси з App.js. деструктуруємо charId
     if (!charId) {
       return;
     }
 
-    this.onCharLoading();
-    this.marvelService
-      .getCharacter(charId)
-      .then(this.onCharLoaded)
-      .catch(this.onError);
+    onCharLoading();
+    marvelService.getCharacter(charId).then(onCharLoaded).catch(onError);
   };
 
-  onCharLoaded = (char) => {
-    this.setState({ char: char, loading: false });
+  const onCharLoaded = (char) => {
+    setChar(char);
+    setLoading(false);
+  };
+  const onCharLoading = () => {
+    setLoading(true);
   };
 
-  onCharLoading = () => {
-    this.setState({ loading: true });
+  const onError = () => {
+    setError(true);
+    setLoading(false);
   };
 
-  onError = () => {
-    this.setState({ loading: false, error: true });
-  };
+  //змінні в яких прописані умови за яких відображається компонент <ErrorMessage /> або <Spinner /> або <View /> або <Skeleton/>
+  const skeleton = char || loading || error ? null : <Skeleton />;
+  const errorMessage = error ? <ErrorMessage /> : null;
+  const spinner = loading ? <Spinner /> : null;
+  const content = !(loading || error || !char) ? <View char={char} /> : null;
 
-  render() {
-    const { char, loading, error } = this.state; //деструктуризація об'єкта (state)
-
-    //змінні в яких прописані умови за яких відображається компонент <ErrorMessage /> або <Spinner /> або <View /> або <Skeleton/>
-    const skeleton = char || loading || error ? null : <Skeleton />;
-    const errorMessage = error ? <ErrorMessage /> : null;
-    const spinner = loading ? <Spinner /> : null;
-    const content = !(loading || error || !char) ? <View char={char} /> : null;
-
-    return (
-      <div className="char__info">
-        {skeleton}
-        {errorMessage}
-        {spinner}
-        {content}
-      </div>
-    );
-  }
-}
+  return (
+    <div className="char__info">
+      {skeleton}
+      {errorMessage}
+      {spinner}
+      {content}
+    </div>
+  );
+};
 
 const View = ({ char }) => {
   const { name, description, thumbnail, homepage, wiki, comics } = char;
