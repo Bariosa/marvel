@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { useState } from "react";
 
 import AppHeader from "../appHeader/AppHeader";
 import RandomChar from "../randomChar/RandomChar";
@@ -8,41 +8,35 @@ import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 
 import decoration from "../../resources/img/vision.png";
 
-class App extends Component {
-  state = {
-    selectedChar: null,
-  };
+const App = () => {
+  const [selectedChar, setChar] = useState(null);
 
   // метод який встановлює вибраний персонаж (selectedChar)
-  onCharSelected = (id) => {
-    this.setState({
-      selectedChar: id,
-    });
+  const onCharSelected = (id) => {
+    setChar(id);
   };
 
-  render() {
-    return (
-      <div className="app">
-        <AppHeader />
-        <main>
+  return (
+    <div className="app">
+      <AppHeader />
+      <main>
+        <ErrorBoundary>
+          <RandomChar />
+        </ErrorBoundary>
+        <div className="char__content">
           <ErrorBoundary>
-            <RandomChar />
+            {/* створюємо пропс для встановлення персонажа*/}
+            <CharList onCharSelected={onCharSelected} />
           </ErrorBoundary>
-          <div className="char__content">
-            <ErrorBoundary>
-              {/* створюємо пропс для встановлення персонажа*/}
-              <CharList onCharSelected={this.onCharSelected} />
-            </ErrorBoundary>
 
-            <ErrorBoundary>
-              <CharInfo charId={this.state.selectedChar} />
-            </ErrorBoundary>
-          </div>
-          <img className="bg-decoration" src={decoration} alt="vision" />
-        </main>
-      </div>
-    );
-  }
-}
+          <ErrorBoundary>
+            <CharInfo charId={selectedChar} />
+          </ErrorBoundary>
+        </div>
+        <img className="bg-decoration" src={decoration} alt="vision" />
+      </main>
+    </div>
+  );
+};
 
 export default App;

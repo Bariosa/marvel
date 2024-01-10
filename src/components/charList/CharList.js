@@ -1,4 +1,4 @@
-import { Component, createRef } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import "./charList.scss";
 import MarvelService from "../../services/MarvelService";
@@ -6,121 +6,106 @@ import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
 import PropTypes from "prop-types";
 
-class CharList extends Component {
-  //new
-  constructor(props) {
-    super(props);
-    this.myRef = createRef();
-  }
+const CharList = ({ onCharSelected }) => {
+  const [chars, setChars] = useState([]); // Список персонажів
+  const [loading, setLoading] = useState(true); //  вказує на те, чи йде завантаження
+  const [error, setError] = useState(false); // вказує на те, чи виникла помилка
+  const [newItemLoading, setNewItemLoading] = useState(false); //  вказує на те, чи йде завантаження нових елементів
+  const [offset, setOffset] = useState(210); // Початковий зсув для отримання нових персонажів
+  const [charEnded, setCharEnded] = useState(false);
 
-  state = {
-    chars: [], // Список персонажів
-    loading: true, //  вказує на те, чи йде завантаження
-    error: false, // вказує на те, чи виникла помилка
-    newItemLoading: false, //  вказує на те, чи йде завантаження нових елементів
-    offset: 210, // Початковий зсув для отримання нових персонажів
-    charEnded: false,
-  };
+  const myRef = useRef();
 
-  marvelService = new MarvelService(); // Екземпляр сервісу Marvel для отримання даних
+  const marvelService = new MarvelService(); // Екземпляр сервісу Marvel для отримання даних
 
-  componentDidMount() {
-    // Викликається після монтажу компонента
-    this.onRequest(); // Запуск методу для отримання персонажів
-  }
+  useEffect(() => {
+    onRequest(); // Запуск методу для отримання персонажів
+  }, []);
 
-  onItemHandler = (id) => {
-    this.props.onCharSelected(id);
-    this.myRef.current = id;
+  const onItemHandler = (id) => {
+    onCharSelected(id);
+    myRef.current = id;
   };
 
   // Метод для отримання нових персонажів
-  onRequest = () => {
-    const { offset } = this.state; // Деструктуризація стану для отримання поточного значення зсуву
-    this.onCharListLoading(); // Виклик функції для відображення індикатора завантаження
-    this.marvelService
+  const onRequest = () => {
+    onCharListLoading(); // Виклик функції для відображення індикатора завантаження
+    marvelService
       .getAllCharacters(offset) // Виклик сервісу Marvel для отримання персонажів
-      .then((newCharsList) => {
+      .then((newChars) => {
         let ended = false;
-        if (newCharsList.length < 9) {
+        if (newChars.length < 9) {
           ended = true;
         }
 
         // Успішна обробка результатів
-        this.setState(({ chars }) => ({
-          chars: [...chars, ...newCharsList], // Додаємо нових персонажів до поточного списку
-          loading: false, // Вимикаємо індикатор завантаження
-          error: false, // Вимикаємо прапорець помилки
-          newItemLoading: false, // Вимикаємо прапорець завантаження нових елементів
-          offset: offset + 9, // Збільшуємо зсув для наступного запиту
-          charEnded: ended,
-        }));
+
+        setChars((chars) => [...chars, ...newChars]); // Додаємо нових персонажів до поточного списку
+        setLoading(false); // Вимикаємо індикатор завантаження
+        setNewItemLoading(false); // Вимикаємо прапорец
+        setOffset((offset) => offset + 9); // Збільшуємо зсув для наступного запиту
+        setError(false); // Вимикаємо прапорець помилки
+        setCharEnded(ended);
       })
       .catch(() => {
         // Обробка помилки при отриманні персонажів
-        this.setState({
-          chars: [], // Очищаємо список персонажів у випадку помилки
-          loading: false, // Вимикаємо індикатор завантаження
-          error: true, // Вмикаємо прапорець помилки
-        });
+        setChars([]); // Очищаємо список персонажів у випадку помилки
+        setLoading(false); // Вимикаємо індикатор завантаження
+        setError(true); // Вмикаємо прапорець помилки
       });
   };
 
   // Функція для відображення індикатора завантаження нових елементів
-  onCharListLoading = () => {
-    this.setState({
-      newItemLoading: true, // Додаємо прапорець завантаження нових елементів
-    });
+  const onCharListLoading = () => {
+    setNewItemLoading(true); // Додаємо прапорець завантаження нових елементів
   };
 
-  render() {
-    // Відображення різних станів компонента в залежності від значень прапорців
-    if (this.state.error) return <ErrorMessage />; // Відображення повідомлення про помилку
-    if (this.state.loading) return <Spinner />; // Відображення індикатора завантаження
+  // Відображення різних станів компонента в залежності від значень прапорців
+  if (error) return <ErrorMessage />; // Відображення повідомлення про помилку
+  if (loading) return <Spinner />; // Відображення індикатора завантаження
 
-    // Формування списку персонажів для відображення
-    const renderCharsList = this.state.chars.map((char) => (
-      <li
-        //new
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === " " || e.key === "Enter") this.onItemHandler(char.id);
-        }}
-        key={char.id}
-        className={`char__item ${
-          char.id === this.myRef.current ? "char__item--selected" : ""
-        }`}
-        onClick={() => this.onItemHandler(char.id)} // Передача ідентифікатора обраного персонажа до App.js
+  // Формування списку персонажів для відображення
+  const renderCharsList = chars.map((char) => (
+    <li
+      //new
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === " " || e.key === "Enter") onItemHandler(char.id);
+      }}
+      key={char.id}
+      className={`char__item ${
+        char.id === myRef.current ? "char__item--selected" : ""
+      }`}
+      onClick={() => onItemHandler(char.id)} // Передача ідентифікатора обраного персонажа до App.js
+    >
+      <img
+        src={char.thumbnail}
+        alt={char.name}
+        className={
+          char.thumbnail.includes("image_not_available")
+            ? "char__item-img char__item-img--no-image"
+            : "char__item-img"
+        }
+      />
+      <div className="char__name">{char.name}</div>
+    </li>
+  ));
+
+  // Відображення списку персонажів та кнопки "Завантажити більше"
+  return (
+    <div className="char__list">
+      <ul className="char__grid">{renderCharsList}</ul>
+      <button
+        className="button button__main button__long"
+        disabled={newItemLoading}
+        style={{ display: charEnded ? "none" : "block" }}
+        onClick={() => onRequest(offset)} // Виклик методу для отримання нових персонажів
       >
-        <img
-          src={char.thumbnail}
-          alt={char.name}
-          className={
-            char.thumbnail.includes("image_not_available")
-              ? "char__item-img char__item-img--no-image"
-              : "char__item-img"
-          }
-        />
-        <div className="char__name">{char.name}</div>
-      </li>
-    ));
-
-    // Відображення списку персонажів та кнопки "Завантажити більше"
-    return (
-      <div className="char__list">
-        <ul className="char__grid">{renderCharsList}</ul>
-        <button
-          className="button button__main button__long"
-          disabled={this.state.newItemLoading}
-          style={{ display: this.state.charEnded ? "none" : "block" }}
-          onClick={() => this.onRequest(this.state.offset)} // Виклик методу для отримання нових персонажів
-        >
-          <div className="inner">load more</div>
-        </button>
-      </div>
-    );
-  }
-}
+        <div className="inner">load more</div>
+      </button>
+    </div>
+  );
+};
 
 CharList.propType = {
   onCharSelected: PropTypes.func.isRequired,
