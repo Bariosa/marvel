@@ -1,18 +1,14 @@
 import { useState, useEffect } from "react";
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
-import MarvelService from "../../services/MarvelService";
+import useMarvelService from "../../services/MarvelService";
 
 import "./randomChar.scss";
 import mjolnir from "../../resources/img/mjolnir.png";
 
 const RandomChar = () => {
   const [char, setChar] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  //створюємо нову властивість this.marvelService всередині класу RandomChar
-  const marvelService = new MarvelService(); // новий екземпляр класу MarvelService, в якому зберігається нащадок класу
+  const { loading, error, getCharacter, clearError } = useMarvelService();
 
   // один з методів життєвого циклу компонента
   useEffect(() => {
@@ -21,23 +17,14 @@ const RandomChar = () => {
 
   const onCharLoaded = (char) => {
     setChar(char);
-    setLoading(false);
-  };
-
-  const onError = () => {
-    setLoading(false);
-    setError(true);
-  };
-
-  const onCharLoading = () => {
-    setLoading(true);
   };
 
   //метод звертається до сервера - отримує дані - записує в state
   const updateChar = () => {
+    clearError();
     const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000); //випадкове id персонажа. рандомне число розраховується за формулою
-    onCharLoading();
-    marvelService.getCharacter(id).then(onCharLoaded).catch(onError);
+
+    getCharacter(id).then(onCharLoaded);
   };
 
   //змінні в яких прописані умови за яких відображається компонент <ErrorMessage /> або <Spinner /> або <View />
@@ -75,7 +62,7 @@ const View = ({ char }) => {
   // const style = thumbnail.includes("image_not_available")
   //   ? { objectFit: "contain" }
   //   : null;
-  const imgClass = thumbnail.includes("image_not_available")
+  const imgClass = thumbnail?.includes("image_not_available")
     ? "randomchar__img randomchar__img--no-image"
     : "randomchar__img";
 

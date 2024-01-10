@@ -7,6 +7,8 @@ import CharInfo from "../charInfo/CharInfo";
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 
 import decoration from "../../resources/img/vision.png";
+import ComicsList from "../comicsList/ComicsList";
+import AppBanner from "../appBanner/AppBanner";
 
 const App = () => {
   const [selectedChar, setChar] = useState(null);
@@ -19,22 +21,24 @@ const App = () => {
   return (
     <div className="app">
       <AppHeader />
-      <main>
-        <ErrorBoundary>
-          <RandomChar />
-        </ErrorBoundary>
-        <div className="char__content">
-          <ErrorBoundary>
-            {/* створюємо пропс для встановлення персонажа*/}
-            <CharList onCharSelected={onCharSelected} />
-          </ErrorBoundary>
+      <AppBanner />
+      <ComicsList />
+      {/*<main>*/}
+      {/*  <ErrorBoundary>*/}
+      {/*    <RandomChar />*/}
+      {/*  </ErrorBoundary>*/}
+      {/*  <div className="char__content">*/}
+      {/*    <ErrorBoundary>*/}
+      {/*      /!* створюємо пропс для встановлення персонажа*!/*/}
+      {/*      <CharList onCharSelected={onCharSelected} />*/}
+      {/*    </ErrorBoundary>*/}
 
-          <ErrorBoundary>
-            <CharInfo charId={selectedChar} />
-          </ErrorBoundary>
-        </div>
-        <img className="bg-decoration" src={decoration} alt="vision" />
-      </main>
+      {/*    <ErrorBoundary>*/}
+      {/*      <CharInfo charId={selectedChar} />*/}
+      {/*    </ErrorBoundary>*/}
+      {/*  </div>*/}
+      {/*  <img className="bg-decoration" src={decoration} alt="vision" />*/}
+      {/*</main>*/}
     </div>
   );
 };

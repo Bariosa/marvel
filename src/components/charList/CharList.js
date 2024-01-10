@@ -1,25 +1,23 @@
 import { useState, useEffect, useRef } from "react";
+import PropTypes from "prop-types";
 
-import "./charList.scss";
-import MarvelService from "../../services/MarvelService";
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
-import PropTypes from "prop-types";
+import useMarvelService from "../../services/MarvelService";
+import "./charList.scss";
 
 const CharList = ({ onCharSelected }) => {
   const [chars, setChars] = useState([]); // Список персонажів
-  const [loading, setLoading] = useState(true); //  вказує на те, чи йде завантаження
-  const [error, setError] = useState(false); // вказує на те, чи виникла помилка
   const [newItemLoading, setNewItemLoading] = useState(false); //  вказує на те, чи йде завантаження нових елементів
   const [offset, setOffset] = useState(210); // Початковий зсув для отримання нових персонажів
   const [charEnded, setCharEnded] = useState(false);
 
   const myRef = useRef();
 
-  const marvelService = new MarvelService(); // Екземпляр сервісу Marvel для отримання даних
+  const { loading, error, getAllCharacters } = useMarvelService();
 
   useEffect(() => {
-    onRequest(); // Запуск методу для отримання персонажів
+    onRequest(offset, true); // Запуск методу для отримання персонажів
   }, []);
 
   const onItemHandler = (id) => {
@@ -28,10 +26,9 @@ const CharList = ({ onCharSelected }) => {
   };
 
   // Метод для отримання нових персонажів
-  const onRequest = () => {
-    onCharListLoading(); // Виклик функції для відображення індикатора завантаження
-    marvelService
-      .getAllCharacters(offset) // Виклик сервісу Marvel для отримання персонажів
+  const onRequest = (offset, initial) => {
+    initial ? setNewItemLoading(false) : setNewItemLoading(true); // Додаємо прапорець завантаження нових елементів
+    getAllCharacters(offset) // Виклик сервісу Marvel для отримання персонажів
       .then((newChars) => {
         let ended = false;
         if (newChars.length < 9) {
@@ -41,28 +38,19 @@ const CharList = ({ onCharSelected }) => {
         // Успішна обробка результатів
 
         setChars((chars) => [...chars, ...newChars]); // Додаємо нових персонажів до поточного списку
-        setLoading(false); // Вимикаємо індикатор завантаження
         setNewItemLoading(false); // Вимикаємо прапорец
         setOffset((offset) => offset + 9); // Збільшуємо зсув для наступного запиту
-        setError(false); // Вимикаємо прапорець помилки
         setCharEnded(ended);
       })
       .catch(() => {
         // Обробка помилки при отриманні персонажів
         setChars([]); // Очищаємо список персонажів у випадку помилки
-        setLoading(false); // Вимикаємо індикатор завантаження
-        setError(true); // Вмикаємо прапорець помилки
       });
-  };
-
-  // Функція для відображення індикатора завантаження нових елементів
-  const onCharListLoading = () => {
-    setNewItemLoading(true); // Додаємо прапорець завантаження нових елементів
   };
 
   // Відображення різних станів компонента в залежності від значень прапорців
   if (error) return <ErrorMessage />; // Відображення повідомлення про помилку
-  if (loading) return <Spinner />; // Відображення індикатора завантаження
+  if (loading && !newItemLoading) return <Spinner />; // Відображення індикатора завантаження
 
   // Формування списку персонажів для відображення
   const renderCharsList = chars.map((char) => (
