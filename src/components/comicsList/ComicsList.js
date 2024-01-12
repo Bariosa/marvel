@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+
 import useMarvelService from "../../services/MarvelService";
 import Spinner from "../spinner/Spinner";
 import ErrorMessage from "../errorMessage/ErrorMessage";
@@ -41,9 +43,9 @@ const ComicsList = () => {
   if (loading && !newItemLoading) return <Spinner />; // Відображення індикатора завантаження
 
   // Формування списку коміксів
-  const renderComicsList = comicsList.map((comics) => (
-    <li key={comics.id} className="comics__item">
-      <a href="#">
+  const renderComicsList = comicsList.map((comics, i) => (
+    <li key={i} className="comics__item">
+      <Link to={`/comics/${comics.id}`}>
         <img
           src={comics.thumbnail}
           alt={comics.title}
@@ -52,7 +54,7 @@ const ComicsList = () => {
 
         <div className="comics__item-name">{comics.title}</div>
         <div className="comics__item-price">{comics.price}</div>
-      </a>
+      </Link>
     </li>
   ));
 
