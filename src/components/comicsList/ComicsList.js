@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 
 import useMarvelService from "../../services/MarvelService";
@@ -12,7 +12,6 @@ const ComicsList = () => {
   const [newItemLoading, setNewItemLoading] = useState(false);
   const [offset, setOffset] = useState(0);
   const [comicsEnded, setComicsEnded] = useState(false);
-
   const { loading, error, getAllComics } = useMarvelService();
 
   useEffect(() => {

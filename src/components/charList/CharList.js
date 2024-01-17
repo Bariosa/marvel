@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import PropTypes from "prop-types";
 
 import Spinner from "../spinner/Spinner";
@@ -86,7 +86,9 @@ const CharList = ({ onCharSelected }) => {
       <button
         className="button button__main button__long"
         disabled={newItemLoading}
-        style={{ display: charEnded ? "none" : "block" }}
+        style={{
+          display: charEnded ? "none" : "block",
+        }}
         onClick={() => onRequest(offset)} // Виклик методу для отримання нових персонажів
       >
         <div className="inner">load more</div>
