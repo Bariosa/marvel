@@ -25,6 +25,7 @@ const useMarvelService = () => {
     return _transformCharacter(result.data.results[0]);
   };
 
+  //запит на персонажа за іменем
   const getCharacterByName = async (name) => {
     const result = await request(
       `${_apiBase}characters?name=${name}&${_apiKey}`,
