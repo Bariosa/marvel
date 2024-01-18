@@ -25,6 +25,13 @@ const useMarvelService = () => {
     return _transformCharacter(result.data.results[0]);
   };
 
+  const getCharacterByName = async (name) => {
+    const result = await request(
+      `${_apiBase}characters?name=${name}&${_apiKey}`,
+    ); // Request URL з сайту Marvel Developer
+    return _transformCharacter(result.data.results[0]);
+  };
+
   //метод отримує дані та трансформує в необхідні. в нашому випадку отримує великий об'єкт з даними про персонажа і повертає об'єкт з потрібними нам даними
   const _transformCharacter = (char) => {
     //перевірка для description
@@ -78,6 +85,7 @@ const useMarvelService = () => {
     loading,
     error,
     getCharacter,
+    getCharacterByName,
     getAllCharacters,
     clearError,
     getComics,

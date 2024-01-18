@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import AppHeader from "../appHeader/AppHeader";
@@ -8,6 +8,7 @@ const Page404 = lazy(() => import("../pages/404"));
 const MainPage = lazy(() => import("../pages/MainPage"));
 const ComicsPage = lazy(() => import("../pages/ComicsPage"));
 const SingleComicPage = lazy(() => import("../pages/SingleComicPage"));
+const SingleCharacterPage = lazy(() => import("../pages/SingleCharacterPage"));
 
 const App = () => {
   return (
@@ -22,6 +23,11 @@ const App = () => {
               <Route path="/comics" element={<ComicsPage />} />
 
               <Route path="/comics/:comicId" element={<SingleComicPage />} />
+
+              <Route
+                path="/character/:charId"
+                element={<SingleCharacterPage />}
+              />
 
               <Route path="*" element={<Page404 />} />
             </Routes>
