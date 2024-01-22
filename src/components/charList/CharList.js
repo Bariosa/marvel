@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
-import Spinner from "../spinner/Spinner";
-import ErrorMessage from "../errorMessage/ErrorMessage";
 import useMarvelService from "../../services/MarvelService";
+import setContent from "../../utils/setContent";
+
 import "./charList.scss";
 
 const CharList = ({ onCharSelected }) => {
@@ -14,7 +14,7 @@ const CharList = ({ onCharSelected }) => {
 
   const myRef = useRef();
 
-  const { loading, error, getAllCharacters } = useMarvelService();
+  const { getAllCharacters, process, setProcess } = useMarvelService();
 
   useEffect(() => {
     onRequest(offset, true); // Запуск методу для отримання персонажів
@@ -41,6 +41,7 @@ const CharList = ({ onCharSelected }) => {
         setNewItemLoading(false); // Вимикаємо прапорец
         setOffset((offset) => offset + 9); // Збільшуємо зсув для наступного запиту
         setCharEnded(ended);
+        setProcess("confirmed");
       })
       .catch(() => {
         // Обробка помилки при отриманні персонажів
@@ -49,8 +50,8 @@ const CharList = ({ onCharSelected }) => {
   };
 
   // Відображення різних станів компонента в залежності від значень прапорців
-  if (error) return <ErrorMessage />; // Відображення повідомлення про помилку
-  if (loading && !newItemLoading) return <Spinner />; // Відображення індикатора завантаження
+  // if (error) return <ErrorMessage />; // Відображення повідомлення про помилку
+  // if (loading && !newItemLoading) return <Spinner />; // Відображення індикатора завантаження
 
   // Формування списку персонажів для відображення
   const renderCharsList = chars.map((char) => (
@@ -82,7 +83,9 @@ const CharList = ({ onCharSelected }) => {
   // Відображення списку персонажів та кнопки "Завантажити більше"
   return (
     <div className="char__list">
-      <ul className="char__grid">{renderCharsList}</ul>
+      <ul className="char__grid">
+        {setContent(process, () => renderCharsList)}
+      </ul>
       <button
         className="button button__main button__long"
         disabled={newItemLoading}

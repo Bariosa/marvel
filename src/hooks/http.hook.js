@@ -4,6 +4,8 @@ export const useHttp = () => {
   const [loading, setLoading] = useState(false); //  вказує на те, чи йде завантаження
   const [error, setError] = useState(null); // вказує на те, чи виникла помилка
 
+  const [process, setProcess] = useState("waiting");
+
   // useCallback приймає асинхронну функцію, бо ми працюємо з запитами
   const request = useCallback(
     async (
@@ -13,6 +15,7 @@ export const useHttp = () => {
       headers = { "Content-Type": "application/json" },
     ) => {
       setLoading(true);
+      setProcess("loading");
 
       try {
         const response = await fetch(url, { method, body, headers });
@@ -28,13 +31,17 @@ export const useHttp = () => {
       } catch (e) {
         setLoading(false);
         setError(e.message);
+        setProcess("error");
         throw e;
       }
     },
     [],
   );
 
-  const clearError = useCallback(() => setError(null), []);
+  const clearError = useCallback(() => {
+    setError(null);
+    setProcess("loading");
+  }, []);
 
-  return { loading, request, error, clearError };
+  return { loading, request, error, clearError, process, setProcess };
 };
