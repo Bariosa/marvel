@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
-import Spinner from "../spinner/Spinner";
-import ErrorMessage from "../errorMessage/ErrorMessage";
+
 import useMarvelService from "../../services/MarvelService";
+import setContent from "../../utils/setContent";
 
 import "./randomChar.scss";
 import mjolnir from "../../resources/img/mjolnir.png";
 
 const RandomChar = () => {
   const [char, setChar] = useState({});
-  const { loading, error, getCharacter, clearError } = useMarvelService();
+  const { getCharacter, clearError, process, setProcess } = useMarvelService();
 
   // один з методів життєвого циклу компонента
   useEffect(() => {
@@ -24,19 +24,14 @@ const RandomChar = () => {
     clearError();
     const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000); //випадкове id персонажа. рандомне число розраховується за формулою
 
-    getCharacter(id).then(onCharLoaded);
+    getCharacter(id)
+      .then(onCharLoaded)
+      .then(() => setProcess("confirmed"));
   };
-
-  //змінні в яких прописані умови за яких відображається компонент <ErrorMessage /> або <Spinner /> або <View />
-  const errorMessage = error ? <ErrorMessage /> : null;
-  const spinner = loading ? <Spinner /> : null;
-  const content = !(loading || error) ? <View char={char} /> : null;
 
   return (
     <div className="randomchar">
-      {errorMessage}
-      {spinner}
-      {content}
+      {setContent(process, View, char)}
       <div className="randomchar__static">
         <p className="randomchar__title">
           Random character for today!
@@ -56,8 +51,8 @@ const RandomChar = () => {
 };
 
 //компонент для відображення елементу верстки(простий елемент рендерингу)
-const View = ({ char }) => {
-  const { name, description, thumbnail, homepage, wiki } = char; //деструктуризація об'єкта (char) з даними про персонажа
+const View = ({ data }) => {
+  const { name, description, thumbnail, homepage, wiki } = data; //деструктуризація об'єкта (char) з даними про персонажа
 
   // const style = thumbnail.includes("image_not_available")
   //   ? { objectFit: "contain" }

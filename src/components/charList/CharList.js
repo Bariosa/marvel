@@ -2,9 +2,29 @@ import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
 import useMarvelService from "../../services/MarvelService";
-import setContent from "../../utils/setContent";
 
 import "./charList.scss";
+import Skeleton from "../skeleton/Skeleton";
+import Spinner from "../spinner/Spinner";
+import ErrorMessage from "../errorMessage/ErrorMessage";
+
+const setContent = (process, Component, newItemLoading) => {
+  switch (process) {
+    case "waiting":
+      return <Spinner />;
+
+    case "loading":
+      return newItemLoading ? <Component /> : <Spinner />;
+
+    case "confirmed":
+      return <Component />;
+
+    case "error":
+      return <ErrorMessage />;
+    default:
+      throw new Error("Unexpected process state");
+  }
+};
 
 const CharList = ({ onCharSelected }) => {
   const [chars, setChars] = useState([]); // Список персонажів
@@ -84,7 +104,7 @@ const CharList = ({ onCharSelected }) => {
   return (
     <div className="char__list">
       <ul className="char__grid">
-        {setContent(process, () => renderCharsList)}
+        {setContent(process, () => renderCharsList, newItemLoading)}
       </ul>
       <button
         className="button button__main button__long"
